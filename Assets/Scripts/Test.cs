@@ -13,7 +13,7 @@ public class Test : MonoBehaviour
     HexGrid grid;
     HexGridShapeHex shapeHex;
     HexGridShapeRect shapeRect;
-
+    HexGridTerritory territory;
     Dictionary<TileIndex, HexTile> tiles = new Dictionary<TileIndex, HexTile>();
 
     // Use this for initialization
@@ -33,6 +33,8 @@ public class Test : MonoBehaviour
 
         shapeRect = new HexGridShapeRect(grid);
         shapeRect.UpdateTiles(CameraManager.Instance.center, width, height, OnCreateHexTile, OnRemoveHexTile);
+
+        territory = new HexGridTerritory(grid);
     }
 
 
@@ -82,36 +84,48 @@ public class Test : MonoBehaviour
         {
             Vector3 position = CameraManager.Instance.GetWorldMousePosition();
             TileIndex index = grid.IndexOf(position);
-            if(isSetFrom==false)
-            {
-                from = index;
-                isSetFrom = true;
-            }
-            else
-            {
-                isSetFrom = false;
-                var paths = grid.FindPath(from, index, (t) =>
-                {
-                    return true;
-                });
+            territory.AddTile(index);
+            //if(isSetFrom==false)
+            //{
+            //    from = index;
+            //    isSetFrom = true;
+            //}
+            //else
+            //{
+            //    isSetFrom = false;
+            //    var paths = grid.FindPath(from, index, (t) =>
+            //    {
+            //        return true;
+            //    });
 
-                if(paths!= null)
-                {
-                    for(int i = 0; i < paths.Count; ++i)
-                    {
-                        if (tiles.ContainsKey(paths[i]))
-                        {
-                            tiles[paths[i]].SetColor(Color.yellow);
-                        }
-                    }
-                }
+            //    if(paths!= null)
+            //    {
+            //        for(int i = 0; i < paths.Count; ++i)
+            //        {
+            //            if (tiles.ContainsKey(paths[i]))
+            //            {
+            //                tiles[paths[i]].SetColor(Color.yellow);
+            //            }
+            //        }
+            //    }
 
 
-            }
+            //}
 
             if(tiles.ContainsKey(index))
             {
                 tiles[index].SetColor(Color.yellow);
+            }
+        }
+
+        if(Input.GetKeyDown(KeyCode.T))
+        {
+            var verts = territory.GetTerritoryVertexs(true);
+            for(int i = 0; i < verts.Count; i++)
+            {
+                GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                go.transform.position = verts[i];
+                go.name = "vert-" + i;
             }
         }
     }

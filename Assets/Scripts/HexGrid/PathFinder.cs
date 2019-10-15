@@ -10,14 +10,14 @@ public class PathFinder<T> where T : IEquatable<T>
     internal class PathNode
     {
         public T t { get; private set; }
-        public int h;
-        public int g;
+        public int h; //从指定的方格移动到终点的估算成本。
+        public int g; //从起点移动到指定方格的移动代价
         public int f
         {
             get { return h + g; }
         }
         public T parent { get; private set; }
-        public bool isParent { get; private set; }
+        public bool hasParent { get; private set; }
 
         public PathNode(T t)
         {
@@ -28,14 +28,14 @@ public class PathFinder<T> where T : IEquatable<T>
         public void SetParent(T parent)
         {
             this.parent = parent;
-            isParent = true;
+            hasParent = true;
         }
         public void Clear()
         {
             h = 0;
             g = 0;
             parent = default(T);
-            isParent = false;
+            hasParent = false;
         }
     }
 
@@ -117,7 +117,7 @@ public class PathFinder<T> where T : IEquatable<T>
                 {
                     result.Insert(0, t);
                     var node = GetPathNode(t);
-                    if (node != null && node.isParent)
+                    if (node != null && node.hasParent)
                     {
                         t = node.parent;
                     }
