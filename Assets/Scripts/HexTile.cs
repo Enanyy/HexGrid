@@ -5,11 +5,14 @@ public class HexTile
 {
     public TileIndex index { get; set; }
    
-    public Vector3 position { get; set; }
-   
-    public Vector3 worldPosition
+    public Vector3 localPosition
     {
-        get { return grid.root.TransformPoint(position); }
+        get { return grid.TilePosition(index); }
+    }
+   
+    public Vector3 position
+    {
+        get { return grid.TilePosition(index,true); }
     }
     public HexGrid grid { get; set; }
 
@@ -40,7 +43,7 @@ public class HexTile
     {
         gameObject = new GameObject(index.ToString());
         gameObject.transform.SetParent(grid.root);
-        gameObject.transform.localPosition = position;
+        gameObject.transform.localPosition = localPosition;
 
         MeshFilter filter = gameObject.AddComponent<MeshFilter>();
         mRenderer = gameObject.AddComponent<MeshRenderer>();

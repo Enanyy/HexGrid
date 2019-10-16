@@ -54,8 +54,7 @@ public class Test : MonoBehaviour
     {
         HexTile tile = new HexTile();
         tile.index = index;
-        tile.position = grid.TilePosition(index);
-
+      
         tile.grid = grid;
         tile.OnCreate();
 

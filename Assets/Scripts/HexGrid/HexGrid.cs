@@ -44,6 +44,10 @@ public struct TileIndex :IEquatable<TileIndex>
     {
         return new TileIndex(a.x - b.x, a.y - b.y, a.z - b.z);
     }
+    public static TileIndex operator *(TileIndex a, int b)
+    {
+        return new TileIndex(a.x *b, a.y * b, a.z * b);
+    }
 
     public override bool Equals(object obj)
     {
@@ -124,17 +128,11 @@ public class HexGrid
     /// <returns></returns>
     public TileIndex IndexOf(Vector3 worldPosition)
     {
-        return IndexOf(worldPosition.x, worldPosition.z);
-    }
+        Vector3 localPosition = root.InverseTransformPoint(worldPosition);
+        float x = localPosition.x;
+        float z = localPosition.z;
 
-    public TileIndex IndexOf(float x, float z)
-    {
-       
-        Vector3 localPosition = root.InverseTransformPoint(new Vector3(x, 0, z));
-        x = localPosition.x;
-        z = localPosition.z;
-  
-        if(orientation == HexOrientation.Flat)
+        if (orientation == HexOrientation.Flat)
         {
             int q = (int)Math.Round(x / radius / 1.5f, MidpointRounding.AwayFromZero);
             int r = (int)Math.Round(z / radius / SQRT3 - q * 0.5f, MidpointRounding.AwayFromZero);
@@ -149,24 +147,17 @@ public class HexGrid
             return new TileIndex(q, r, -q - r);
         }
     }
-
   
-    public TileIndex DirectionTo(Vector3 position, HexDirection direction, int distance)
+    public TileIndex DirectionTo(Vector3 worldPosition, HexDirection direction, int distance)
     {
-        return DirectionTo(IndexOf(position), direction, distance);
+        return DirectionTo(IndexOf(worldPosition), direction, distance);
     }
-    public TileIndex DirectionTo(float x, float z, HexDirection direction, int distance)
-    {
-        return DirectionTo(IndexOf(x,z), direction, distance);
-    }
+ 
   
     public TileIndex DirectionTo(TileIndex index, HexDirection direction, int distance)
     {
         int i = (int) direction;
-        TileIndex o;
-        o.x = index.x + directions[i].x * distance;
-        o.y = index.y + directions[i].y * distance;
-        o.z = index.z + directions[i].z * distance;
+        TileIndex o = index + directions[i] * distance;
         return o;
     }
 
@@ -194,14 +185,11 @@ public class HexGrid
         return Neighbours(IndexOf(x, z));
     }
 
-    public List<TileIndex> Neighbours(float x, float z)
-    {
-        return Neighbours(IndexOf(x, z));
-    }
+ 
 
-    public List<TileIndex> Neighbours(Vector3 position)
+    public List<TileIndex> Neighbours(Vector3 worldPosition)
     {
-        return Neighbours(IndexOf(position));
+        return Neighbours(IndexOf(worldPosition));
     }
 
     public List<TileIndex> TilesInRange(TileIndex index, int range)
