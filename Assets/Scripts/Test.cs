@@ -76,42 +76,40 @@ public class Test : MonoBehaviour
     // Update is called once per frame
     bool isSetFrom = false;
     TileIndex from = TileIndex.zero;
-
+    List<TileIndex> paths = new List<TileIndex>();
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
             Vector3 position = CameraManager.Instance.GetWorldMousePosition();
             TileIndex index = grid.IndexOf(position);
             territory.AddTile(index);
-            //if(isSetFrom==false)
-            //{
-            //    from = index;
-            //    isSetFrom = true;
-            //}
-            //else
-            //{
-            //    isSetFrom = false;
-            //    var paths = grid.FindPath(from, index, (t) =>
-            //    {
-            //        return true;
-            //    });
+            if (isSetFrom == false)
+            {
+                from = index;
+                isSetFrom = true;
+            }
+            else
+            {
+                isSetFrom = false;
+                grid.FindPath(ref paths, from, index, (t) =>
+                {
+                    return true;
+                });
 
-            //    if(paths!= null)
-            //    {
-            //        for(int i = 0; i < paths.Count; ++i)
-            //        {
-            //            if (tiles.ContainsKey(paths[i]))
-            //            {
-            //                tiles[paths[i]].SetColor(Color.yellow);
-            //            }
-            //        }
-            //    }
+                if (paths != null)
+                {
+                    for (int i = 0; i < paths.Count; ++i)
+                    {
+                        if (tiles.ContainsKey(paths[i]))
+                        {
+                            tiles[paths[i]].SetColor(Color.yellow);
+                        }
+                    }
+                }
+            }
 
-
-            //}
-
-            if(tiles.ContainsKey(index))
+            if (tiles.ContainsKey(index))
             {
                 tiles[index].SetColor(Color.yellow);
             }

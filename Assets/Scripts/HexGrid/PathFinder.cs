@@ -60,15 +60,22 @@ public class PathFinder<T> where T : IEquatable<T>
       
     }
 
-    public List<T> FindPath(T from, T to, Func<T, bool> isValid, Func<T, List<T>> getNeihbors, Func<T, T, int> getCostValue)
+    public bool FindPath(ref List<T> result, T from, T to, Func<T, bool> isValid, Func<T, IEnumerator<T>> getNeihbors, Func<T, T, int> getCostValue)
     {
         if (from.Equals(to) || isValid == null || getNeihbors == null || getCostValue == null)
         {
             Debug.LogError("参数不能为空");
-            return null;
+            return false;
         }
 
-        List<T> result = new List<T>();
+        if(result == null)
+        {
+            Debug.LogError("The param result is null.");
+
+            return false;
+        }
+
+        result.Clear();
 
         mOpenList.Clear();
         mCloseList.Clear();
@@ -134,10 +141,12 @@ public class PathFinder<T> where T : IEquatable<T>
             //1.如果是墙或者在关闭列表中则跳过
             //2.如果点不在开启列表中则添加
             //3.如果点在开启列表中且当前的总花费比之前的总花费小，则更新该点信息
-            List<T> neighbours = getNeihbors(cur);
-            for (int i = 0; i < neighbours.Count; i++)
+
+            var getNeihbor = getNeihbors(cur);
+
+            while(getNeihbor.MoveNext())
             {
-                T neighbour = neighbours[i];
+                T neighbour = getNeihbor.Current;
 
                 if (isValid(neighbour) == false || mCloseList.Contains(neighbour))
                     continue;
@@ -160,7 +169,7 @@ public class PathFinder<T> where T : IEquatable<T>
             }
         }
 
-        return result;
+        return result.Count > 0;
     }
     #endregion
 }

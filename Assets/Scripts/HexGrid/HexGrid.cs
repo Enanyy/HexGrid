@@ -383,14 +383,18 @@ public class HexGrid
     #endregion
 
     private PathFinder<TileIndex> mPathFinder = new PathFinder<TileIndex>();
-    public List<TileIndex> FindPath(TileIndex from, TileIndex to, Func<TileIndex, bool> isValid)
+    public bool FindPath(ref List<TileIndex> result, TileIndex from, TileIndex to, Func<TileIndex, bool> isValid)
     {
         if(from == to || isValid == null)
         {
             Debug.LogError("参数错误");
-            return null;
+            return false;
         }
-        return mPathFinder.FindPath(from, to, isValid, Neighbours, GetCostValue);
+
+        return mPathFinder.FindPath(ref result, from, to, isValid,(tile)=>
+        {
+            var neighbours = Neighbours(tile); return neighbours.GetEnumerator();
+        }, GetCostValue);
     }
 }
 
