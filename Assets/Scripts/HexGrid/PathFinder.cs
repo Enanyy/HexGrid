@@ -43,21 +43,24 @@ public class PathFinder<T> where T : IEquatable<T>
     private List<T> mCloseList = new List<T>();
     private Dictionary<T, PathNode> mNodeDic = new Dictionary<T, PathNode>();
 
-    private PathNode GetPathNode(T t, bool create = false)
+    private PathNode GetOrCreatePathNode(T t)
     {
         PathNode node;
-        if(mNodeDic.TryGetValue(t, out node) == false)
+        if (mNodeDic.TryGetValue(t, out node) == false)
         {
-            if(create)
-            {
-                node = new PathNode(t);
+            node = new PathNode(t);
 
-                mNodeDic.Add(t, node);
-            }
+            mNodeDic.Add(t, node);
         }
-
         return node;
-      
+    }
+
+    private PathNode GetPathNode(T t)
+    {
+        PathNode node;
+        mNodeDic.TryGetValue(t, out node);
+       
+        return node;
     }
 
     public bool FindPath(ref List<T> result, T from, T to, Func<T, bool> isValid, Func<T, IEnumerator<T>> getNeihbors, Func<T, T, int> getCostValue)
@@ -68,7 +71,7 @@ public class PathFinder<T> where T : IEquatable<T>
             return false;
         }
 
-        if(result == null)
+        if (result == null)
         {
             Debug.LogError("The param result is null.");
 
@@ -96,13 +99,13 @@ public class PathFinder<T> where T : IEquatable<T>
             //遍历开启列表，找到消费最小的点作为检查点
             T cur = mOpenList[0];
 
-            PathNode curNode = GetPathNode(cur, true);
+            PathNode curNode = GetOrCreatePathNode(cur);
 
             for (int i = 0; i < mOpenList.Count; i++)
             {
                 T t = mOpenList[i];
 
-                PathNode node = GetPathNode(t, true);
+                PathNode node = GetOrCreatePathNode(t);
 
                 if (node.f < curNode.f && node.h < curNode.h)
                 {
@@ -144,7 +147,7 @@ public class PathFinder<T> where T : IEquatable<T>
 
             var getNeihbor = getNeihbors(cur);
 
-            while(getNeihbor.MoveNext())
+            while (getNeihbor.MoveNext())
             {
                 T neighbour = getNeihbor.Current;
 
@@ -153,7 +156,7 @@ public class PathFinder<T> where T : IEquatable<T>
 
                 int cost = curNode.g + getCostValue(neighbour, cur);
 
-                PathNode neighborNode = GetPathNode(neighbour, true);
+                PathNode neighborNode = GetOrCreatePathNode(neighbour);
 
                 if (cost < neighborNode.g || mOpenList.Contains(neighbour) == false)
                 {
